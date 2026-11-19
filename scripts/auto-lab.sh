@@ -17,7 +17,10 @@ fi
 free -h | awk 'NR<=2'
 
 if ! kind get clusters 2>/dev/null | grep -qx lab; then
-  paso "00 Instalar herramientas"; ./scripts/00-instalar-herramientas.sh || { echo "FALLO 00"; exit 1; }
+  paso "00 Instalar herramientas"; ./scripts/00-instalar-herramientas.sh
+  # El paso 00 puede salir con error solo al imprimir versiones (| head + pipefail); se valida lo importante:
+  for t in docker kind kubectl trivy; do command -v "$t" >/dev/null || { echo "FALLO 00: falta $t"; exit 1; }; done
+  sysctl -w vm.max_map_count=524288 >/dev/null
   paso "01 Crear cluster";         ./scripts/01-crear-cluster.sh         || { echo "FALLO 01"; exit 1; }
 else
   docker start lab-control-plane >/dev/null 2>&1; sleep 30

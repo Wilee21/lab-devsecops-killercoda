@@ -1,0 +1,5 @@
+node_modules/
+.sonar-token
+.scannerwork/
+trivy-*.txt
+trivy-*.sarif
